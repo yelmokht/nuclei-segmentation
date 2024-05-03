@@ -1,12 +1,12 @@
 from contextlib import closing
-import customtkinter # type: ignore
+import customtkinter
 from view.frames.inference import InferenceFrame
 from view.frames.performance import PerformanceFrame
 from view.frames.train import TrainFrame
 import matplotlib.pyplot as plt
 
-customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+customtkinter.set_appearance_mode("System") 
+customtkinter.set_default_color_theme("blue")
 
 class App(customtkinter.CTk):
     def __init__(self):
