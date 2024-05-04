@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "nuclei-segmentation"
 version = "0.1.0"
-description = ""
+description= "An application designed to accurately segment nuclei cells across diverse conditions using pretrained models."
 authors = ["yelmokht <younes.el.mokhtari@ulb.be>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.10.12"
@@ -17,10 +18,12 @@ tqdm = "^4.66.2"
 customtkinter = "^5.2.2"
 keras = "2.15"
 tensorflow = "2.15"
-tensorflow-addons = "^0.23.0"
-segmentation-models = "^1.0.1"
+tensorflow-addons = "0.23.0"
+segmentation-models = "1.0.1"
+ctkmessagebox = "^2.5"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+package-mode = false

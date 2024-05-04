@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import numpy as np
+from skimage.segmentation import mark_boundaries
 # from ipywidgets import interact, IntSlider, Layout
 # from matplotlib.colors import LinearSegmentedColormap
 
@@ -101,6 +103,14 @@ def print_plot_history(history):
     axes[1, 1].set_ylim(0, 1)
     axes[1, 1].legend()
     
+    return fig
+
+
+def plot_prediction(image, pp_mask):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
+    fig = plt.gcf()
     return fig
 
 

@@ -1,5 +1,6 @@
 from contextlib import closing
 import customtkinter
+from CTkMessagebox import CTkMessagebox
 from view.frames.inference import InferenceFrame
 from view.frames.performance import PerformanceFrame
 from view.frames.train import TrainFrame
@@ -62,7 +63,13 @@ class App(customtkinter.CTk):
 
     def show_frame(self, frame_name):
         if self.current_frame:
-            self.current_frame.destroy()
+            if isinstance(self.current_frame, InferenceFrame) and self.current_frame.loading_thread:
+                if self.current_frame.loading_thread.is_alive():        
+                        msg = CTkMessagebox(master=self, title="Exit?", message="A model is being loaded. Are you sure you want to exit?",
+                        icon="question", option_1="Cancel", option_2="No", option_3="Yes", sound=True)
+                        response = msg.get()
+                        if response=="No" or response=="Cancel":
+                            return
 
         if frame_name == "Train":
             self.current_frame = TrainFrame(self.content_frame)

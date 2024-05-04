@@ -1,14 +1,19 @@
 from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 import customtkinter
 from glob import glob
-from model.config import MODELS_PATH
+from model.config import MODELS_PATH, IMAGE_SHAPE
 import threading
 from model.model import load_unet_model
-from model.data import load_image_list_from_stage, load_image
-from model.visualization import plot_image
+from model.data import load_image_list_from_stage, load_image, read_image
+from model.inference import tta
+from model.pre_processing import preprocess
+from model.visualization import plot_image, plot_prediction
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 matplotlib.use('TkAgg')
+import numpy as np
 
 class InferenceFrame(customtkinter.CTkFrame):
     def __init__(self, parent):
@@ -16,6 +21,7 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.model_name = None
         self.model = None
         self.index = 0
+        self.loading_thread = None
 
         self.first_frame = customtkinter.CTkFrame(self)
         self.first_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -62,10 +68,10 @@ class InferenceFrame(customtkinter.CTkFrame):
 
         self.image_combobox.grid(row=0, column=3, padx=10, pady=10, sticky="nsew")
 
-        self.predict_button = customtkinter.CTkButton(self.second_frame, text="Predict")
+        self.predict_button = customtkinter.CTkButton(self.second_frame, text="Predict", command=lambda:predict_callback(self))
         self.predict_button.grid(row=0, column=4, padx=10, pady=10)
 
-        self.import_predict_button = customtkinter.CTkButton(self.second_frame, text="Import and predict")
+        self.import_predict_button = customtkinter.CTkButton(self.second_frame, text="Import and predict", command=lambda:import_and_predict_callback(self))
         self.import_predict_button.grid(row=0, column=5, padx=10, pady=10)
 
         self.previous_button = customtkinter.CTkButton(self.fourth_frame, text="<", command=lambda:stage_callback(self, self.index - 1))
@@ -73,6 +79,9 @@ class InferenceFrame(customtkinter.CTkFrame):
 
         self.next_button = customtkinter.CTkButton(self.fourth_frame, text=">", command=lambda:stage_callback(self, self.index + 1))
         self.next_button.grid(row=0, column=2, padx=10, pady=10)
+
+    def popup_message(message):
+        messagebox.showinfo("Information", message)
 
 def load_unet_model_thread(self):
     try:
@@ -93,9 +102,9 @@ def load_callback(self):
         self.progressbar_1.update()
         self.model_name = self.model_combobox.get()
         print(self.model_name)
-        loading_thread = threading.Thread(target=load_unet_model_thread, args=(self,))
-        loading_thread.start()
-        while loading_thread.is_alive():
+        self.loading_thread = threading.Thread(target=load_unet_model_thread, args=(self,))
+        self.loading_thread.start()
+        while self.loading_thread.is_alive():
             self.update()
         self.progressbar_1.stop()
         self.progressbar_1.grid_remove()
@@ -124,3 +133,44 @@ def image_combobox_callback(self):
     canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
     canvas.draw()
     canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+    if self.model is not None:
+        predict_callback(self)
+
+def predict_callback(self):
+    if self.model is None or self.image_combobox.get() == 'Select an image' or self.stage_combobox.get() == 'Select stage':
+        print("Model, image or stage not selected")
+        return None
+    
+    image = np.array([preprocess(load_image(self.stage_combobox.get(), self.index), IMAGE_SHAPE)])
+    prediction = tta(self.model, image)
+    fig = plot_prediction(image[0], prediction[0])
+    canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
+    self.update()
+    self.update_idletasks()
+
+def import_and_predict_callback(self):
+    if self.model is None:
+        print("Model not selected")
+        return None
+
+    file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
+    if not file_path:
+        return None
+    
+    fig = plot_image(read_image(file_path))
+    canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+    
+    image = np.array([preprocess(read_image(file_path), IMAGE_SHAPE)])
+    prediction = tta(self.model, image)
+    fig = plot_prediction(image[0], prediction[0])
+    canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
+    self.update()
+    self.update_idletasks()
+

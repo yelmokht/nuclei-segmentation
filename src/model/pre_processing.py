@@ -1,4 +1,4 @@
-from config import *
+from model.config import *
 import numpy as np
 from skimage.transform import resize
 from skimage.color import rgb2gray

@@ -114,4 +114,4 @@ def load_unet_model(model_name):
     model_path = './models/' + model_name + '/model.keras'
     model = load_model(model_path, compile=False)
     history = load_history(model_name)
-    return model, history
+    return model

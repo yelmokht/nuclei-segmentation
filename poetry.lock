@@ -222,6 +222,21 @@ test = ["Pillow", "contourpy[test-no-images]", "matplotlib"]
 test-no-images = ["pytest", "pytest-cov", "pytest-xdist", "wurlitzer"]
 
 [[package]]
+name = "ctkmessagebox"
+version = "2.5"
+description = "A modern messagebox for customtkinter"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "CTkMessagebox-2.5-py3-none-any.whl", hash = "sha256:b3220c57bca16cec51d310e8d7cad9383dc36b30c943e5913f2e1f1644b6332e"},
+    {file = "CTkMessagebox-2.5.tar.gz", hash = "sha256:155c20e6ce0a1fd6ba43079db43e7f7bc124018f58141a15c993668aef6dae14"},
+]
+
+[package.dependencies]
+customtkinter = "*"
+pillow = "*"
+
+[[package]]
 name = "customtkinter"
 version = "5.2.2"
 description = "Create modern looking GUIs with Python"
@@ -1668,13 +1683,13 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "tifffile"
-version = "2024.4.24"
+version = "2024.5.3"
 description = "Read and write TIFF files"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tifffile-2024.4.24-py3-none-any.whl", hash = "sha256:8d0b982f4b01ace358835ae6c2beb5a70cb7287f5d3a2e96c318bd5befa97b1f"},
-    {file = "tifffile-2024.4.24.tar.gz", hash = "sha256:e329f36ac8ff3bbe7dd04609340be26b03c4b9e9a69235fc3ab33434157c38ea"},
+    {file = "tifffile-2024.5.3-py3-none-any.whl", hash = "sha256:cac4d939156ff7f16d65fd689637808a7b5b3ad58f9c73327fc009b0aa32c7d5"},
+    {file = "tifffile-2024.5.3.tar.gz", hash = "sha256:44521508ecc51ebaf0e47e9748913e9c7331a4e32fb571ff4dfc05cb8f4d8896"},
 ]
 
 [package.dependencies]
@@ -1874,4 +1889,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.12"
-content-hash = "b61ecea2bae357509ddc73d4ab444d63e43248496a0dadaa953e115a5cc5f62d"
+content-hash = "65c56c70ccd87f50a71335a9d43b001dcf2e1831e9c2d661180f8071ddbe737e"

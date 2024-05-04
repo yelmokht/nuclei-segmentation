@@ -9,15 +9,15 @@ def tta(model, images):
         original_prediction = model.predict(np.expand_dims(image, axis=0), verbose=0)
         tta_predictions.append(np.squeeze(original_prediction))
 
-        for angle in range(90, 360, 90):
-            rotated_image = np.rot90(image, k=angle // 90)
-            rotated_prediction = model.predict(np.expand_dims(rotated_image, axis=0), verbose=0)
-            tta_predictions.append(np.rot90(np.squeeze(rotated_prediction), k=-angle // 90))
+        # for angle in range(90, 360, 90):
+        #     rotated_image = np.rot90(image, k=angle // 90)
+        #     rotated_prediction = model.predict(np.expand_dims(rotated_image, axis=0), verbose=0)
+        #     tta_predictions.append(np.rot90(np.squeeze(rotated_prediction), k=-angle // 90))
 
         # Horizontal flip
-        horizontal_flip = np.fliplr(image)
-        horizontal_flip_prediction = model.predict(np.expand_dims(horizontal_flip, axis=0), verbose=0)
-        tta_predictions.append(np.fliplr(np.squeeze(horizontal_flip_prediction)))
+        # horizontal_flip = np.fliplr(image)
+        # horizontal_flip_prediction = model.predict(np.expand_dims(horizontal_flip, axis=0), verbose=0)
+        # tta_predictions.append(np.fliplr(np.squeeze(horizontal_flip_prediction)))
 
         # Vertical flip
         # vertical_flip = np.flipud(image)
