@@ -4,6 +4,8 @@ from view.frames.inference import InferenceFrame
 from view.frames.performance import PerformanceFrame
 from view.frames.train import TrainFrame
 import matplotlib.pyplot as plt
+import sys
+import os
 
 customtkinter.set_appearance_mode("System") 
 customtkinter.set_default_color_theme("blue")
@@ -13,7 +15,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Nuclei segmentation")
-        self.geometry(f"{1280}x{720}")
+        self.geometry(f"{1440}x{900}")
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
@@ -81,3 +83,5 @@ class App(customtkinter.CTk):
     def on_closing(self):
         plt.close()
         self.quit()
+        self.destroy()
+        os._exit(0)

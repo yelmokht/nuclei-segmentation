@@ -1,7 +1,8 @@
 from tkinter import ttk
-import customtkinter # type: ignore
+import customtkinter
 from glob import glob
 from model.config import MODELS_PATH
+import threading
 from model.model import load_unet_model
 from model.data import load_image_list_from_stage, load_image
 from model.visualization import plot_image
@@ -37,17 +38,20 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.model_combobox.set("Select a model")
         self.model_combobox.grid(row=0, column=1, padx=10, pady=10)
 
-        self.load_button = customtkinter.CTkButton(self.first_frame, text="Load", command=lambda x:load_callback(self))
+        self.load_button = customtkinter.CTkButton(self.first_frame, text="Load", command=lambda:load_callback(self))
         self.load_button.grid(row=0, column=2, padx=10, pady=10)
 
         self.label = customtkinter.CTkLabel(self.first_frame, text="No model loaded")
         self.label.grid(row=0, column=3, padx=10, pady=10)
 
+        self.progressbar_1 = customtkinter.CTkProgressBar(self.first_frame)
+
         self.stage_label = customtkinter.CTkLabel(self.second_frame, text="Stage:")
         self.stage_label.grid(row=0, column=0, padx=10, pady=10)
 
-        self.image_combobox = ttk.Combobox(self.second_frame, width=30)
+        self.image_combobox = ttk.Combobox(self.second_frame, width=70)
         self.image_combobox.set("Select an image")
+        self.image_combobox.bind("<<ComboboxSelected>>", lambda event: image_combobox_callback(self))
 
         self.stage_combobox = customtkinter.CTkComboBox(self.second_frame, values=["Train", "Stage 1", "Stage 2"], command=lambda x: stage_callback(self, 0))
         self.stage_combobox.set("Select stage")
@@ -70,17 +74,34 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.next_button = customtkinter.CTkButton(self.fourth_frame, text=">", command=lambda:stage_callback(self, self.index + 1))
         self.next_button.grid(row=0, column=2, padx=10, pady=10)
 
+def load_unet_model_thread(self):
+    try:
+        self.model = load_unet_model(self.model_name)
+    except Exception as e:
+        print("Error loading model:", e)
+
 def load_callback(self):
     if self.model_combobox.get() == 'Select a model':
         return None
     if self.model_name == self.model_combobox.get():
         self.label.configure(text=f"Model {self.model_name} already loaded")
     else:
-        self.label.configure(text=f"Loading model {self.model_combobox.get()} ...")
+        self.label.grid_remove()
+        self.progressbar_1.grid(row=0, column=3, padx=(10, 10), pady=(10, 10), sticky="ew")
+        self.progressbar_1.configure(mode="indeterminnate")
+        self.progressbar_1.start()
+        self.progressbar_1.update()
         self.model_name = self.model_combobox.get()
         print(self.model_name)
-        self.model = load_unet_model(self.model_name)
+        loading_thread = threading.Thread(target=load_unet_model_thread, args=(self,))
+        loading_thread.start()
+        while loading_thread.is_alive():
+            self.update()
+        self.progressbar_1.stop()
+        self.progressbar_1.grid_remove()
         self.label.configure(text=f"Model {self.model_name} loaded successfully !")
+        self.label.grid(row=0, column=3, padx=10, pady=10)
+        self.label.update()
 
 def stage_callback(self, index):
     if self.stage_combobox.get() == 'Select stage':
@@ -89,9 +110,15 @@ def stage_callback(self, index):
     if index >=0 and index < len(load_image_list_from_stage(self.stage_combobox.get())):
         self.index = index
 
-    
     images_list = load_image_list_from_stage(self.stage_combobox.get())
-    self.image_combobox.configure(values=images_list, width=max([len(image) for image in images_list]))
+    self.image_combobox.configure(values=images_list)
+    self.image_combobox.set(images_list[self.index])
+    image_combobox_callback(self)
+
+def image_combobox_callback(self):
+    if self.image_combobox.get() == 'Select an image':
+        return None
+    self.index = self.image_combobox.current()
     image = load_image(self.stage_combobox.get(), self.index)
     fig = plot_image(image)
     canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
