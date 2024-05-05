@@ -119,7 +119,7 @@ def train(model_name, batch_size, epochs):
     train_images, train_masks, = load_data_1(TRAIN_PATH)
     pp_train_images, pp_train_masks= preprocess_data_1(train_images, train_masks)
     pp_train_images, pp_val_images, pp_train_masks, pp_val_masks = train_val_split(pp_train_images, pp_train_masks, ratio=0.3)
-    train_generator, val_generator, steps_per_epoch, validation_steps = generate_augmented_data(pp_train_images, pp_train_masks, pp_val_images, pp_val_masks)
+    train_generator, val_generator, steps_per_epoch, validation_steps = generate_augmented_data(pp_train_images, pp_train_masks, pp_val_images, pp_val_masks, batch_size)
     model = modified_unet_model()
     model, history = train_model(model, train_generator, val_generator, epochs, steps_per_epoch, validation_steps)
     dir_path = f"./models/{model_name}"

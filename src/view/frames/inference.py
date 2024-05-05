@@ -86,6 +86,7 @@ class InferenceFrame(customtkinter.CTkFrame):
 def load_unet_model_thread(self):
     try:
         self.model = load_unet_model(self.model_name)
+        print("Model loaded successfully")
     except Exception as e:
         print("Error loading model:", e)
 

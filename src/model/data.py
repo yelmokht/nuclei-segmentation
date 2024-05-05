@@ -5,11 +5,11 @@ import numpy as np
 import pandas as pd
 import os
 from skimage.io import imsave
-from tqdm.auto import tqdm
+from tqdm import tqdm
 import warnings
 from skimage.io import imread
 from glob import glob
-from tqdm.auto import tqdm
+from tqdm import tqdm
 import numpy as np
 from skimage.measure import regionprops, label
 from skimage.transform import resize

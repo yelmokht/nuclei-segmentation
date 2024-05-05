@@ -1,5 +1,6 @@
 from model.data import load_data
 from view.app import App
+from model.model import train
 
 def main():
     load_data()
