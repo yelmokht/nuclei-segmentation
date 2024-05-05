@@ -125,7 +125,14 @@ def binary_mask(id):
         binary_mask[masks[index] > 0] = 255
     return binary_mask
 
-def load_data(train_path, test_1_path, test_2_path):
+def load_data_1(train_path):
+    train_image_paths = sorted(glob(train_path + '*/images/*.png'))
+    train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
+    train_images = [read_image(image_path) for image_path in tqdm(train_image_paths, desc='Loading train images')]
+    train_masks = [binary_mask(id) for id in tqdm(train_ids, desc='Loading train masks')]
+    return train_images, train_masks
+
+def load_data_2(train_path, test_1_path, test_2_path):
     train_image_paths = sorted(glob(train_path + '*/images/*.png'))
     test_1_image_paths = sorted(glob(test_1_path + '*/images/*.png'))
     test_2_image_paths = sorted(glob(test_2_path + '*/images/*.png'))

@@ -4,17 +4,21 @@ from keras.layers import MaxPool2D
 from keras.metrics import MeanIoU
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import Precision, Recall
-from tensorflow_addons.metrics import F1Score
 from tensorflow.keras.metrics import MeanIoU
 from tensorflow import keras
+from keras.models import load_model
 from keras.optimizers import Adam, SGD
 import os
+
+from model.augmentation import generate_augmented_data, train_val_split
+from model.data import load_data_1
+from model.pre_processing import preprocess_data_1
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
 from segmentation_models.losses import bce_jaccard_loss, JaccardLoss, bce_dice_loss
 from segmentation_models.metrics import IOUScore, FScore, Precision, Recall
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 import pandas as pd
 
 from model.config import *
@@ -72,36 +76,32 @@ def jaccard_loss(y_true, y_pred):
 
 def unet_model():
     model = unet(INPUT_SHAPE)
-    model.compile(optimizer=Adam(), loss=jaccard_loss, metrics=[IoU(), 'accuracy', Precision(), Recall(), F1Score()])
+    model.compile(optimizer=Adam(), loss=JaccardLoss(), metrics=['accuracy'])
     # model.summary()
     return model
 
 def modified_unet_model():
-    model = sm.Unet('resnet152')
-    model.compile(optimizer=Adam(), loss = JaccardLoss(), metrics=[IOUScore(), 'accuracy', FScore(beta=1), Precision(), Recall()])
+    print('Creating model')
+    model = sm.Unet()
+    model.compile(optimizer=Adam(), loss=JaccardLoss(), metrics=[IOUScore(), 'accuracy', FScore(beta=1), Precision(), Recall()])
     # model.summary()
     return model
 
+
+def train_model(model, train_generator, val_generator, epochs, steps_per_epoch, validation_steps):
+    print('Training model')
+    history = model.fit_generator(train_generator, validation_data=val_generator, steps_per_epoch=steps_per_epoch, validation_steps=validation_steps, epochs=epochs)
+    return model, history
+
+def save_model(model, file_path):
+    print('Saving model')
+    model.save(file_path)
+
 def save_history(history, file_path):
+    print('Saving history')
     history_df = pd.DataFrame(history.history)
     history_df.to_csv(file_path, index=False)
     history = history_df.to_dict(orient='list')
-    return history
-
-def train_model(model, train_generator, val_generator, steps_per_epoch, validation_steps, path):
-    checkpoint_callback = ModelCheckpoint(monitor='val_loss', filepath=f'model_checkpoint_{EPOCHS}.h5', save_best_only=True)
-    history = model.fit_generator(train_generator,
-                                validation_data=val_generator,
-                                steps_per_epoch=steps_per_epoch,
-                                validation_steps=validation_steps,
-                                epochs=EPOCHS,
-                                callbacks=[checkpoint_callback])
-
-    if not os.path.exists(path):
-        model.save(path)
-        history = save_history(history, SAVE_HISTORY_PATH)
-    else:
-        print(f"Model already exists at {path}. Skipping saving.")
     return history
 
 def load_history(model_name):
@@ -111,7 +111,21 @@ def load_history(model_name):
     return history
 
 def load_unet_model(model_name):
-    model_path = './models/' + model_name + '/model.keras'
-    model = load_model(model_path, compile=False)
-    history = load_history(model_name)
+    model_path = './models/' + f'{model_name}/' + 'model.h5'
+    model = load_model(model_path)
     return model
+
+def train(model_name, batch_size, epochs):
+    train_images, train_masks, = load_data_1(TRAIN_PATH)
+    pp_train_images, pp_train_masks= preprocess_data_1(train_images, train_masks)
+    pp_train_images, pp_val_images, pp_train_masks, pp_val_masks = train_val_split(pp_train_images, pp_train_masks, ratio=0.3)
+    train_generator, val_generator, steps_per_epoch, validation_steps = generate_augmented_data(pp_train_images, pp_train_masks, pp_val_images, pp_val_masks)
+    model = modified_unet_model()
+    model, history = train_model(model, train_generator, val_generator, epochs, steps_per_epoch, validation_steps)
+    dir_path = f"./models/{model_name}"
+    os.makedirs(dir_path)
+    model_path = f"./models/{model_name}/model.keras"
+    save_model(model, model_path)
+    history_path = f"./models/{model_name}/history.csv"
+    save_history(history, history_path)
+    print(f"Model {model_name} trained successfully.")

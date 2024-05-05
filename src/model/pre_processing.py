@@ -23,7 +23,14 @@ def preprocess(image, shape, param=False):
 
     return processed_image.astype(np.float32)
 
-def preprocess_data(train_images, test_1_images, test_2_images, train_masks, test_1_masks, test_2_masks):
+
+def preprocess_data_1(train_images, train_masks):
+    train_images = np.array([preprocess(image, IMAGE_SHAPE) for image in tqdm(train_images, desc='Pre-processing train images')])
+    train_masks = np.array([preprocess(mask, MASK_SHAPE) for mask in tqdm(train_masks , desc='Pre-processing train masks')])
+    return train_images, train_masks
+
+
+def preprocess_data_2(train_images, test_1_images, test_2_images, train_masks, test_1_masks, test_2_masks):
     train_images = np.array([preprocess(image, IMAGE_SHAPE) for image in tqdm(train_images, desc='Preprocess train images')])
     test_1_images = np.array([preprocess(image, IMAGE_SHAPE) for image in tqdm(test_1_images, desc='Preprocess test images (stage 1)')])
     test_2_images = np.array([preprocess(image, IMAGE_SHAPE) for image in tqdm(test_2_images, desc='Preprocess test images (stage 2)')])

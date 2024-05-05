@@ -1,6 +1,8 @@
 from sklearn.model_selection import train_test_split
 import random
 from keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+from model.config import SEED, BATCH_SIZE
 
 def train_val_split(train_images, train_masks, ratio):
     return train_test_split(train_images, train_masks, test_size=ratio, random_state=0)
@@ -25,7 +27,9 @@ def generate_augmented_data(train_images, train_masks, val_images, val_masks):
                         vertical_flip=True,
                         fill_mode='reflect',
                         preprocessing_function = lambda x: np.where(x>0, 1, 0).astype(x.dtype))
-
+    
+    print('Generating augmented data')
+    
     # Data augmentation
     image_data_generator = ImageDataGenerator(**img_data_gen_args)
     mask_data_generator = ImageDataGenerator(**mask_data_gen_args)
