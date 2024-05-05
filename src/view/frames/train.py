@@ -87,9 +87,7 @@ def train_textbox_thread(self):
                 
                 if current_modification_time != last_modification_time or current_file_size > last_file_size:
                     with open("temp.txt") as f:
-                        # Move the file pointer to the last known position
                         f.seek(last_file_size)
-                        # Read only the new content since the last check
                         new_content = f.read()
                         self.train_textbox.insert("end", new_content.replace('\b', ''))
                         if self.train_textbox.yview()[1] > 0.9:
