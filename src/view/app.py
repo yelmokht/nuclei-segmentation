@@ -23,7 +23,8 @@ class App(customtkinter.CTk):
 
         self.sidebar_frame = customtkinter.CTkFrame(self, width=140)
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, padx=10, pady= 10, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(4, weight=1)
+        self.sidebar_frame.grid_rowconfigure(0, weight=1)
+        self.sidebar_frame.grid_columnconfigure(0, weight=1)
 
         self.content_frame = customtkinter.CTkFrame(self)
         self.content_frame.grid(row=0, column=1, padx=(0, 10), pady=10, rowspan=4, sticky="nsew")
@@ -36,23 +37,27 @@ class App(customtkinter.CTk):
 
     def create_sidebar(self):
 
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Nuclei", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.internal_frame = customtkinter.CTkFrame(self.sidebar_frame)
+        self.internal_frame.grid(row=0, column=0, sticky="nsew")
+        self.internal_frame.grid_rowconfigure(4, weight=1)
+
+        self.logo_label = customtkinter.CTkLabel(self.internal_frame, text="Nuclei", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, text="Train a new model", command=lambda: self.show_frame("Train"))
+        self.sidebar_button_1 = customtkinter.CTkButton(self.internal_frame, text="Train a new model", command=lambda: self.show_frame("Train"))
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
 
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, text="Predict with a model", command=lambda: self.show_frame("Predict"))
+        self.sidebar_button_2 = customtkinter.CTkButton(self.internal_frame, text="Predict with a model", command=lambda: self.show_frame("Predict"))
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
 
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, text="Information about a model", command=lambda: self.show_frame("Information"))
+        self.sidebar_button_3 = customtkinter.CTkButton(self.internal_frame, text="Information about a model", command=lambda: self.show_frame("Information"))
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
 
-        self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance:", anchor="w")
+        self.appearance_mode_label = customtkinter.CTkLabel(self.internal_frame, text="Appearance:", anchor="w")
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
 
-        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
-        self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.internal_frame, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
+        self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(20, 20))
 
         # self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
         # self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
