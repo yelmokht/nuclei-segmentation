@@ -1,3 +1,4 @@
+import multiprocessing
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -24,16 +25,21 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.loading_thread = None
 
         self.first_frame = customtkinter.CTkFrame(self)
-        self.first_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-
         self.second_frame = customtkinter.CTkFrame(self)
-        self.second_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        # self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        # self.grid_columnconfigure(1, weight=1)
+
+        self.first_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        self.second_frame.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
         self.third_frame = customtkinter.CTkFrame(self)
-        self.third_frame.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        self.third_frame.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
         self.fourth_frame = customtkinter.CTkFrame(self)
-        self.fourth_frame.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
+        self.fourth_frame.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
         self.model_label.grid(row=0, column=0, padx=10, pady=10)
@@ -74,11 +80,14 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.import_predict_button = customtkinter.CTkButton(self.second_frame, text="Import and predict", command=lambda:import_and_predict_callback(self))
         self.import_predict_button.grid(row=0, column=5, padx=10, pady=10)
 
+        self.fourth_frame.grid_columnconfigure(0, weight=1)
+        self.fourth_frame.grid_columnconfigure(1, weight=1)
+
         self.previous_button = customtkinter.CTkButton(self.fourth_frame, text="<", command=lambda:stage_callback(self, self.index - 1))
-        self.previous_button.grid(row=0, column=0, padx=10, pady=10)
+        self.previous_button.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         self.next_button = customtkinter.CTkButton(self.fourth_frame, text=">", command=lambda:stage_callback(self, self.index + 1))
-        self.next_button.grid(row=0, column=2, padx=10, pady=10)
+        self.next_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
     def popup_message(message):
         messagebox.showinfo("Information", message)
@@ -86,7 +95,6 @@ class InferenceFrame(customtkinter.CTkFrame):
 def load_unet_model_thread(self):
     try:
         self.model = load_unet_model(self.model_name)
-        print("Model loaded successfully")
     except Exception as e:
         print("Error loading model:", e)
 
@@ -104,6 +112,7 @@ def load_callback(self):
         self.model_name = self.model_combobox.get()
         print(self.model_name)
         self.loading_thread = threading.Thread(target=load_unet_model_thread, args=(self,))
+        self.loading_thread.setDaemon(True)
         self.loading_thread.start()
         while self.loading_thread.is_alive():
             self.update()

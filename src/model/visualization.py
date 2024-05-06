@@ -30,7 +30,7 @@ from skimage.segmentation import mark_boundaries
 
 def plot_image(image):
     plt.close('all')
-    plt.figure(figsize=(4, 4))
+    plt.figure(figsize=(5, 5))
     plt.imshow(image)
     fig = plt.gcf()
     return fig
@@ -65,7 +65,7 @@ def plot_image(image):
 
 def print_plot_history(history):
     plt.close('all')
-    fig, axes = plt.subplots(2, 2, figsize=(10, 6), layout='compressed')
+    fig, axes = plt.subplots(2, 2, figsize=(12, 6), layout='compressed')
 
     axes[0, 0].plot(history['iou_score'], label='Train Iou')
     axes[0, 0].plot(history['loss'], label='Train Loss')
@@ -108,7 +108,7 @@ def print_plot_history(history):
 
 def plot_prediction(image, pp_mask):
     plt.close('all')
-    plt.figure(figsize=(4, 4))
+    plt.figure(figsize=(5, 5))
     plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
     fig = plt.gcf()
     return fig

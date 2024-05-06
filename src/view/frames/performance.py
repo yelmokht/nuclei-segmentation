@@ -12,9 +12,12 @@ class PerformanceFrame(customtkinter.CTkFrame):
         super().__init__(parent)
         
         self.first_frame = customtkinter.CTkFrame(self)
-        self.first_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-
         self.second_frame = customtkinter.CTkFrame(self)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+
+        self.first_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
         self.second_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
@@ -31,5 +34,5 @@ class PerformanceFrame(customtkinter.CTkFrame):
         fig = print_plot_history(history)
         canvas = FigureCanvasTkAgg(fig, master=self.second_frame)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+        canvas.get_tk_widget().grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
