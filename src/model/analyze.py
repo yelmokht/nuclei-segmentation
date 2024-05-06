@@ -42,6 +42,3 @@ def analyze_data(train_images, test_1_images, test_2_images):
         print(f"Most common size in {set_name}:", size)
 
     return most_common_overall
-
-
-analyze_data(train_images, test_1_images, test_2_images)

@@ -1,13 +1,8 @@
 from keras.models import Model
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Activation
-from keras.layers import MaxPool2D
-from keras.metrics import MeanIoU
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import Precision, Recall
-from tensorflow.keras.metrics import MeanIoU
-from tensorflow import keras
+from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Conv2DTranspose, BatchNormalization, Activation
+from tensorflow.keras.optimizers import Adam # type: ignore
+from tensorflow.keras.metrics import Precision, Recall # type: ignore
 from keras.models import load_model
-from keras.optimizers import Adam, SGD
 import os
 
 from model.augmentation import generate_augmented_data, train_val_split
@@ -15,12 +10,10 @@ from model.data import load_data_1
 from model.pre_processing import preprocess_data_1
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
-from segmentation_models.losses import bce_jaccard_loss, JaccardLoss, bce_dice_loss
+from segmentation_models.losses import JaccardLoss
 from segmentation_models.metrics import IOUScore, FScore, Precision, Recall
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 import tensorflow as tf
 import pandas as pd
-
 from model.config import *
 
 # Convolution block
@@ -64,8 +57,8 @@ def unet(input_shape):
   d4 = decoder_block(d3, s1, 64)
 
   outputs = Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
-
   model = Model(inputs, outputs, name="U-Net")
+
   return model
 
 def jaccard_loss(y_true, y_pred):
@@ -104,16 +97,16 @@ def save_history(history, file_path):
     history = history_df.to_dict(orient='list')
     return history
 
+def load_unet_model(model_name):
+    model_path = './models/' + f'{model_name}/' + 'model.h5'
+    model = load_model(model_path)
+    return model
+
 def load_history(model_name):
     history_path = './models/' + model_name + '/history.csv'
     history_df = pd.read_csv(history_path)
     history = history_df.to_dict(orient='list')
     return history
-
-def load_unet_model(model_name):
-    model_path = './models/' + f'{model_name}/' + 'model.h5'
-    model = load_model(model_path)
-    return model
 
 def train(model_name, batch_size, epochs):
     train_images, train_masks, = load_data_1(TRAIN_PATH)

@@ -12,7 +12,6 @@ from glob import glob
 from tqdm import tqdm
 import numpy as np
 from skimage.measure import regionprops, label
-from skimage.transform import resize
 from model.config import *
 from model.pre_processing import preprocess
 import gdown
@@ -245,6 +244,7 @@ def load_solution(test_1_path, test_2_path):
 def get_model_path(model_name):
     return f'model_{model_name}.keras'
 
+# Load data
 def load_data():
     if not os.path.exists(SOURCE_PATH):
         print('DSB 2018 dataset not found.')
