@@ -122,7 +122,7 @@ def plot_prediction(image, pp_mask):
 
 def print_plot_history(history):
     plt.close('all')
-    fig, axes = plt.subplots(2, 2, figsize=(11, 5), layout='compressed')
+    fig, axes = plt.subplots(2, 2, figsize=(11, 5))
 
     axes[0, 0].plot(history['iou_score'], label='Train Iou')
     axes[0, 0].plot(history['loss'], label='Train Loss')
@@ -159,5 +159,7 @@ def print_plot_history(history):
     axes[1, 1].set_ylabel('Metrics')
     axes[1, 1].set_ylim(0, 1)
     axes[1, 1].legend()
+
+    plt.tight_layout()
     
     return fig
