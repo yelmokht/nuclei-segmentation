@@ -63,9 +63,7 @@ def score(masks, pred, verbose=True):
 def individual_score(mask, pred):
     labels = label(mask)
     y_pred = label(pred)
-
-    print(labels.shape, y_pred.shape)
-
+    
     # Compute number of objects
     true_objects = len(np.unique(labels)) # Background = 0
     pred_objects = len(np.unique(y_pred)) # Background = 0

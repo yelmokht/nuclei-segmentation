@@ -28,34 +28,6 @@ from skimage.segmentation import mark_boundaries
 
 #         plt.show()
 
-def plot_image(image):
-    plt.close('all')
-    plt.figure(figsize=(4, 4))
-    plt.title('Image')
-    plt.imshow(image)
-    plt.tight_layout()
-    fig = plt.gcf()
-    return fig
-
-def plot_ground_truth(gt_mask):
-    plt.close('all')
-    plt.figure(figsize=(4, 4))
-    plt.title('Ground truth mask')
-    plt.imshow(gt_mask)
-    plt.tight_layout()
-    fig = plt.gcf()
-    return fig
-
-def plot_prediction(image, pp_mask):
-    plt.close('all')
-    plt.figure(figsize=(4, 4))
-    plt.title('Post processed mask')
-    plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
-    plt.tight_layout()
-    fig = plt.gcf()
-    return fig
-
-
 # def visualize_augmented_data(train_generator, val_generator, steps_per_epoch, validation_steps):
 #     batch_size = BATCH_SIZE
 #     num_cols = 4
@@ -84,9 +56,73 @@ def plot_prediction(image, pp_mask):
 
 #         plt.show()
 
+# def show_results(images, gt_masks, labels, pred_masks, pp_masks, verbose=True):
+#     colors = [(0, 0, 1), (1, 1, 1), (1, 0, 0)]  # (blue, white, red)
+#     cmap_name = 'custom_cmap'
+#     cm = LinearSegmentedColormap.from_list(cmap_name, colors)
+
+#     scores = []
+#     for idx, (image, gt_mask, pred_mask, pp_mask) in enumerate(zip(images, gt_masks, pred_masks, pp_masks)):
+#         if verbose:
+#             fig, ax = plt.subplots(1, 4, figsize=(20, 20))
+
+#             ax[0].set_title(f'Image n°{idx}')
+#             ax[0].imshow(image)
+
+#             ax[1].set_title(f'Ground truth mask n°{idx}')
+#             ax[1].imshow(gt_mask)
+
+#             ax[2].set_title(f'Post processed mask n°{idx}')
+#             ax[2].imshow(np.expand_dims(pp_mask, axis=-1))
+
+#             a = np.squeeze(gt_masks[idx]) - (pp_masks[idx] > 0).astype(np.uint8)
+#             ax[3].set_title('Differences')
+#             ax[3].imshow(a, cmap=cm, vmin=-1, vmax=1)
+
+#         a = labels[idx]
+#         b = label(pp_mask)
+#         score_i = score(a, b, verbose=verbose)
+#         scores.append(score_i)
+#         plt.show()
+
+#     print(f'LB = {np.mean(scores)}')
+
+# visualize_augmented_data(train_generator, val_generator, steps_per_epoch, validation_steps)
+# plot_images(train_images, train_masks, test_1_images, test_1_masks, test_2_images, test_2_masks)
+# plot_images(pp_train_images, pp_train_masks, pp_test_1_images, pp_test_1_masks, pp_test_2_images, pp_test_2_masks)
+# print_plot_history(history)
+# # show_results(test_1_images, test_1_masks, test_1_labels, test_1_pred_masks, test_1_pp_masks, verbose=False)
+
+def plot_image(image):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.title('Image')
+    plt.imshow(image)
+    plt.tight_layout()
+    fig = plt.gcf()
+    return fig
+
+def plot_ground_truth(gt_mask):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.title('Ground truth mask')
+    plt.imshow(gt_mask)
+    plt.tight_layout()
+    fig = plt.gcf()
+    return fig
+
+def plot_prediction(image, pp_mask):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.title('Post processed mask')
+    plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
+    plt.tight_layout()
+    fig = plt.gcf()
+    return fig
+
 def print_plot_history(history):
     plt.close('all')
-    fig, axes = plt.subplots(2, 2, figsize=(12, 6), layout='compressed')
+    fig, axes = plt.subplots(2, 2, figsize=(11, 5), layout='compressed')
 
     axes[0, 0].plot(history['iou_score'], label='Train Iou')
     axes[0, 0].plot(history['loss'], label='Train Loss')
@@ -125,40 +161,3 @@ def print_plot_history(history):
     axes[1, 1].legend()
     
     return fig
-
-# def show_results(images, gt_masks, labels, pred_masks, pp_masks, verbose=True):
-#     colors = [(0, 0, 1), (1, 1, 1), (1, 0, 0)]  # (blue, white, red)
-#     cmap_name = 'custom_cmap'
-#     cm = LinearSegmentedColormap.from_list(cmap_name, colors)
-
-#     scores = []
-#     for idx, (image, gt_mask, pred_mask, pp_mask) in enumerate(zip(images, gt_masks, pred_masks, pp_masks)):
-#         if verbose:
-#             fig, ax = plt.subplots(1, 4, figsize=(20, 20))
-
-#             ax[0].set_title(f'Image n°{idx}')
-#             ax[0].imshow(image)
-
-#             ax[1].set_title(f'Ground truth mask n°{idx}')
-#             ax[1].imshow(gt_mask)
-
-#             ax[2].set_title(f'Post processed mask n°{idx}')
-#             ax[2].imshow(np.expand_dims(pp_mask, axis=-1))
-
-#             a = np.squeeze(gt_masks[idx]) - (pp_masks[idx] > 0).astype(np.uint8)
-#             ax[3].set_title('Differences')
-#             ax[3].imshow(a, cmap=cm, vmin=-1, vmax=1)
-
-#         a = labels[idx]
-#         b = label(pp_mask)
-#         score_i = score(a, b, verbose=verbose)
-#         scores.append(score_i)
-#         plt.show()
-
-#     print(f'LB = {np.mean(scores)}')
-
-# visualize_augmented_data(train_generator, val_generator, steps_per_epoch, validation_steps)
-# plot_images(train_images, train_masks, test_1_images, test_1_masks, test_2_images, test_2_masks)
-# plot_images(pp_train_images, pp_train_masks, pp_test_1_images, pp_test_1_masks, pp_test_2_images, pp_test_2_masks)
-# print_plot_history(history)
-# # show_results(test_1_images, test_1_masks, test_1_labels, test_1_pred_masks, test_1_pp_masks, verbose=False)

@@ -20,6 +20,9 @@ class PerformanceFrame(customtkinter.CTkFrame):
         self.first_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
         self.second_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
+        self.second_frame.grid_rowconfigure(0, weight=1)
+        self.second_frame.grid_columnconfigure(0, weight=1)
+
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
         self.model_label.grid(row=0, column=0, padx=10, pady=10)
 

@@ -5,7 +5,6 @@ from view.frames.inference import InferenceFrame
 from view.frames.performance import PerformanceFrame
 from view.frames.train import TrainFrame
 import matplotlib.pyplot as plt
-import sys
 import os
 
 customtkinter.set_appearance_mode("System") 
@@ -22,12 +21,12 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure((2, 3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
-        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
+        self.sidebar_frame = customtkinter.CTkFrame(self, width=140)
+        self.sidebar_frame.grid(row=0, column=0, rowspan=4, padx=10, pady= 10, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
 
         self.content_frame = customtkinter.CTkFrame(self)
-        self.content_frame.grid(row=0, column=1, rowspan=4, sticky="nsew")
+        self.content_frame.grid(row=0, column=1, padx=(0, 10), pady=10, rowspan=4, sticky="nsew")
         self.content_frame.grid_columnconfigure(0, weight=1)
         self.content_frame.grid_rowconfigure(0, weight=1)
         self.current_frame = None
@@ -61,7 +60,7 @@ class App(customtkinter.CTk):
         # self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"], command=self.change_scaling_event)
         # self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
-    def show_frame(self, frame_name):
+    def is_thread_running(self):
         if self.current_frame:
             if isinstance(self.current_frame, InferenceFrame) and self.current_frame.loading_thread:
                 if self.current_frame.loading_thread.is_alive():        
@@ -69,9 +68,10 @@ class App(customtkinter.CTk):
                         icon="question", option_1="Cancel", option_2="No", option_3="Yes", sound=True)
                         response = msg.get()
                         if response=="No" or response=="Cancel":
-                            return
+                            return True
                         else:
                             print("Loading model stopped.")
+                            return False
                         
             if isinstance(self.current_frame, TrainFrame) and self.current_frame.training_thread:
                 if self.current_frame.training_thread.is_alive():        
@@ -79,11 +79,15 @@ class App(customtkinter.CTk):
                         icon="question", option_1="Cancel", option_2="No", option_3="Yes", sound=True)
                         response = msg.get()
                         if response=="No" or response=="Cancel":
-                            return
+                            return True
                         else:
                             self.training_thread = None
                             print("Training model stopped.")
+                            return False
 
+    def show_frame(self, frame_name):
+        if self.is_thread_running():
+            return
         if frame_name == "Train":
             self.current_frame = TrainFrame(self.content_frame)
         elif frame_name == "Predict":
@@ -101,6 +105,10 @@ class App(customtkinter.CTk):
         customtkinter.set_widget_scaling(new_scaling_float)
     
     def on_closing(self):
+        if self.is_thread_running():
+            return
+        print("Closing application.")
+        # os.remove("temp.txt") # check if app accidentally closed
         plt.close()
         self.quit()
         self.destroy()

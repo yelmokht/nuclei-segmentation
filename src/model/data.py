@@ -1,17 +1,15 @@
 import os
 import shutil
 from zipfile import ZipFile
+from glob import glob
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import os
-from skimage.io import imsave
+from skimage.io import imsave, imread
+from skimage.measure import regionprops, label
 from tqdm import tqdm
 import warnings
-from skimage.io import imread
-from glob import glob
-from tqdm import tqdm
-import numpy as np
-from skimage.measure import regionprops, label
 from model.config import *
 from model.pre_processing import preprocess
 import gdown
@@ -118,21 +116,45 @@ def read_image(image_path):
 
 def binary_mask(id):
     masks_paths = glob(id + '/masks/*.png')
-    masks = np.array([np.squeeze(preprocess(read_image(mask_path), MASK_SHAPE)) for mask_path in masks_paths])
+    masks = np.array([read_image(mask_path) for mask_path in masks_paths])
     num_masks, height, width = masks.shape
     binary_mask = np.zeros((height, width), np.uint8)
     for index in range(0, num_masks):
         binary_mask[masks[index] > 0] = 255
     return binary_mask
 
-def load_data_1(train_path):
+def labeled_mask(id):
+    masks_paths = glob(id + '/masks/*.png')
+    masks =  np.array([read_image(mask_path) for mask_path in masks_paths])
+    masks = np.array([preprocess(mask, MASK_SHAPE, param=True) for mask in masks])
+    num_masks, height, width = masks.shape
+    labeled_mask = np.zeros((height, width), np.uint16)
+    for index in range(0, num_masks):
+        labeled_mask[masks[index] > 0] = index + 1
+    return labeled_mask
+
+def markers(id):
+    masks_paths = glob(id + '/masks/*.png')
+    masks = np.array([read_image(mask_path) for mask_path in masks_paths])
+    markers = []
+    for mask in masks:
+        mask = preprocess(mask, MASK_SHAPE, param=True)
+        labeled_mask = label(mask)
+        regions = regionprops(labeled_mask)
+        for region in regions:
+            center_row, center_col = region.centroid
+            markers.append([center_row, center_col])
+    markers = np.array(markers)
+    return markers
+
+def load_train_data(train_path):
     train_image_paths = sorted(glob(train_path + '*/images/*.png'))
     train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
     train_images = [read_image(image_path) for image_path in tqdm(train_image_paths, desc='Loading train images')]
     train_masks = [binary_mask(id) for id in tqdm(train_ids, desc='Loading train masks')]
     return train_images, train_masks
 
-def load_data_2(train_path, test_1_path, test_2_path):
+def load_all_data(train_path, test_1_path, test_2_path):
     train_image_paths = sorted(glob(train_path + '*/images/*.png'))
     test_1_image_paths = sorted(glob(test_1_path + '*/images/*.png'))
     test_2_image_paths = sorted(glob(test_2_path + '*/images/*.png'))
@@ -189,42 +211,17 @@ def load_ground_truth(stage, index):
     if stage == 'Train':
         train_image_paths = sorted(glob(TRAIN_PATH + '*/images/*.png'))
         train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
-        return binary_mask(train_ids[index])
+        return np.squeeze(preprocess(binary_mask(train_ids[index]), MASK_SHAPE))
     elif stage == 'Stage 1':
         test_1_image_paths = sorted(glob(STAGE_1_PATH + '*/images/*.png'))
         test_1_ids = [path.rsplit('/', 2)[0] for path in test_1_image_paths]
         return labeled_mask(test_1_ids[index])
-
     elif stage == 'Stage 2':
         test_2_image_paths = sorted(glob(STAGE_2_PATH + '*/images/*.png'))
         test_2_ids = [path.rsplit('/', 2)[0] for path in test_2_image_paths]
         return labeled_mask(test_2_ids[index])
     else:
         raise ValueError(f"Invalid stage '{stage}'")
-
-def labeled_mask(id):
-    masks_paths = glob(id + '/masks/*.png')
-    masks =  np.array([read_image(mask_path) for mask_path in masks_paths])
-    masks = np.array([preprocess(mask, MASK_SHAPE, param=True) for mask in masks])
-    num_masks, height, width = masks.shape
-    labeled_mask = np.zeros((height, width), np.uint16)
-    for index in range(0, num_masks):
-        labeled_mask[masks[index] > 0] = index + 1
-    return labeled_mask
-
-def markers(id):
-    masks_paths = glob(id + '/masks/*.png')
-    masks = np.array([read_image(mask_path) for mask_path in masks_paths])
-    markers = []
-    for mask in masks:
-        mask = preprocess(mask, MASK_SHAPE, param=True)
-        labeled_mask = label(mask)
-        regions = regionprops(labeled_mask)
-        for region in regions:
-            center_row, center_col = region.centroid
-            markers.append([center_row, center_col])
-    markers = np.array(markers)
-    return markers
 
 def load_solution(test_1_path, test_2_path):
     test_1_image_paths = sorted(glob(test_1_path + '*/images/*.png'))
