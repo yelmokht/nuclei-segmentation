@@ -8,6 +8,10 @@ Link to download dataset: https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZ
 
 Link to download model: https://drive.google.com/file/d/1UbvdHFv5pvSWy_V-yNSDmrNQmF2bbLSB/view?usp=sharing
 
+## Data set
+
+This application use the dataset from Kaggle
+
 ## Data structure
 
 ```text
@@ -28,7 +32,7 @@ nuclei-segmentation
     pyproject.toml
 ```
 
-## Usage
+## Installation
 
 Make sure first that poetry is installed:
 
@@ -41,6 +45,8 @@ Then, install all necessary packages:
 ```bash
 poetry install
 ```
+
+## Usage
 
 Once this is done, you can run the application:
 
