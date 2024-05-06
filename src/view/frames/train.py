@@ -61,7 +61,8 @@ class TrainFrame(customtkinter.CTkFrame):
         print(f"Training model {self.model_entry.get()}...")
         print(f"Batch size: {self.batch_size_combobox.get()}")
 
-        self.training_thread = multiprocessing.Process(target=training_thread, args=(self,))
+        self.training_thread = threading.Thread(target=training_thread, args=(self,))
+        self.training_thread.setDaemon(True)
         self.training_thread.start()
 
         # self.train_textbox_thread = threading.Thread(target=train_textbox_thread, args=(self,))

@@ -31,6 +31,7 @@ from skimage.segmentation import mark_boundaries
 def plot_image(image):
     plt.close('all')
     plt.figure(figsize=(4, 4))
+    plt.title('Image')
     plt.imshow(image)
     plt.tight_layout()
     fig = plt.gcf()
@@ -39,6 +40,7 @@ def plot_image(image):
 def plot_ground_truth(gt_mask):
     plt.close('all')
     plt.figure(figsize=(4, 4))
+    plt.title('Ground truth mask')
     plt.imshow(gt_mask)
     plt.tight_layout()
     fig = plt.gcf()
@@ -47,6 +49,7 @@ def plot_ground_truth(gt_mask):
 def plot_prediction(image, pp_mask):
     plt.close('all')
     plt.figure(figsize=(4, 4))
+    plt.title('Post processed mask')
     plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
     plt.tight_layout()
     fig = plt.gcf()

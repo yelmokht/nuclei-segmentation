@@ -81,7 +81,7 @@ class App(customtkinter.CTk):
                         if response=="No" or response=="Cancel":
                             return
                         else:
-                            self.current_frame.training_thread.terminate()
+                            self.training_thread = None
                             print("Training model stopped.")
 
         if frame_name == "Train":
