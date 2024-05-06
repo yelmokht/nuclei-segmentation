@@ -15,6 +15,7 @@ from skimage.measure import regionprops, label
 from skimage.transform import resize
 from model.config import *
 from model.pre_processing import preprocess
+import gdown
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -74,7 +75,7 @@ def save_masks(source_path, destination_path, stage):
     already_saved_masks = False
 
     # Iterate over each key in gt_masks
-    for folder_id, masks in tqdm(gt_masks.items(), desc=f'{stage} images'):
+    for folder_id, masks in tqdm(gt_masks.items(), desc=f'Converting RLE to {stage.lower()} masks'):
         folder_path = os.path.join(destination_path, str(folder_id))
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"Destination folder '{folder_path}' does not exist.")
@@ -102,7 +103,7 @@ def remove_ignored_images_masks(csv_path, destination_path):
     df = pd.read_csv(csv_path)
     ignore_images = df.loc[df['Usage'] == 'Ignored', 'ImageId'].tolist()
 
-    for image_id in ignore_images:
+    for image_id in tqdm(ignore_images, desc='Removing ignored images and masks of stage 2'):
         folder_path = os.path.join(destination_path, image_id)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -111,8 +112,7 @@ def remove_ignored_images_masks(csv_path, destination_path):
         df = df[df['ImageId'] != image_id]
 
     df.to_csv(csv_path, index=False)
-    print('stage2_solution.csv updated !')
-    print('Images and masks of stage 2 updated !')
+    print('Ignored images and masks of stage 2 successfully removed !')
 
 def read_image(image_path):
     return imread(image_path).astype(np.uint8)
@@ -246,11 +246,16 @@ def get_model_path(model_name):
     return f'model_{model_name}.keras'
 
 def load_data():
+    if not os.path.exists(SOURCE_PATH):
+        print('DSB 2018 dataset not found.')
+        gdown.download(url=SOURCE_URL, output=SOURCE_PATH, fuzzy=True)
     if not os.path.exists(DATA_PATH):
         unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH) #Should be run only once
         save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1') #Should be run only once
         save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2') #Should be run only once
         remove_ignored_images_masks(STAGE_2_SOLUTION_PATH, TEST_2_PATH) #Should be run only once
-        print("Data successfully loaded. Can start the app")
+        print("Data successfully loaded !")
     else:
-        print("Data already exists. Can start the app")   
+        print("Data already exists.")
+
+    print("The application is now ready to launch.")

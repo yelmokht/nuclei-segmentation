@@ -1,3 +1,4 @@
+SOURCE_URL = 'https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZmtrDccOjKKR/view?usp=sharing'
 ROOT_PATH = './'
 SOURCE_PATH = ROOT_PATH + 'data/' + 'data-science-bowl-2018.zip'
 UNZIPPED_PATH = ROOT_PATH + 'data/' + 'unzipped/'
