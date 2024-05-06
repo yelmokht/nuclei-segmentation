@@ -50,7 +50,7 @@ poetry run python src/main.py
 
 ## Models
 
-This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. You can either train a model inside the application using 'Train a model' part but a GPU is recommended to function properly. Another option is to use Google Colab to train a model and then insert in the models folder following this structure:
+This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. You can either train a model inside the application using `Train a model` part but a GPU is recommended to function properly. Another option is to use Google Colab to train a model and then insert in the `models` folder following this structure:
 
 ```markdown
 models
@@ -59,7 +59,7 @@ models
     │   └── history.csv
 ```
 
-Google colab notebook is available in notebook folder. Model and history should normally be saved inside your Google Drive.
+Google colab notebook is `nuclei.ipynb` available in `notebook` folder. Model and history should normally be saved inside your Google Drive.
 
 ## Screenshots of application
 
