@@ -50,7 +50,7 @@ poetry run python src/main.py
 
 ## Models
 
-This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. You can either train a model inside the application using `Train a model` part but a GPU is recommended to function properly. Another option is to use Google Colab to train a model and then insert in the `models` folder following this structure:
+This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. You can either train a model inside the application using `Train a new model` part but a GPU is recommended to function properly. Another option is to use Google Colab to train a model and then insert in the `models` folder following this structure:
 
 ```markdown
 models
