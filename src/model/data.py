@@ -250,10 +250,10 @@ def load_data():
         print('DSB 2018 dataset not found.')
         gdown.download(url=SOURCE_URL, output=SOURCE_PATH, fuzzy=True)
     if not os.path.exists(DATA_PATH):
-        unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH) #Should be run only once
-        save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1') #Should be run only once
-        save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2') #Should be run only once
-        remove_ignored_images_masks(STAGE_2_SOLUTION_PATH, TEST_2_PATH) #Should be run only once
+        unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH)  #Should be run only once
+        save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1')              #Should be run only once
+        save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2')              #Should be run only once
+        remove_ignored_images_masks(STAGE_2_SOLUTION_PATH, TEST_2_PATH)         #Should be run only once
         print("Data successfully loaded !")
     else:
         print("Data already exists.")
