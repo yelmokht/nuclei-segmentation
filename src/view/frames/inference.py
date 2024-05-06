@@ -4,13 +4,14 @@ from tkinter import filedialog
 from tkinter import messagebox
 import customtkinter
 from glob import glob
-from model.config import MODELS_PATH, IMAGE_SHAPE
+from model.config import *
 import threading
+from model.evaluation import individual_score
 from model.model import load_unet_model
-from model.data import load_image_list_from_stage, load_image, read_image
+from model.data import load_ground_truth, load_image_list_from_stage, load_image, read_image
 from model.inference import tta
 from model.pre_processing import preprocess
-from model.visualization import plot_image, plot_prediction
+from model.visualization import plot_ground_truth, plot_image, plot_prediction
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 matplotlib.use('TkAgg')
@@ -31,6 +32,7 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
         # self.grid_columnconfigure(1, weight=1)
+        
 
         self.first_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
         self.second_frame.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
@@ -38,8 +40,15 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.third_frame = customtkinter.CTkFrame(self)
         self.third_frame.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
+        self.third_frame.grid_rowconfigure(0, weight=1)
+        self.third_frame.grid_columnconfigure(1, weight=1)
+        self.third_frame.grid_columnconfigure(2, weight=1)
+
         self.fourth_frame = customtkinter.CTkFrame(self)
-        self.fourth_frame.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        self.fourth_frame.grid(row=3, column=0, padx=10, pady=(10, 0), sticky="nsew")
+
+        self.fifth_frame = customtkinter.CTkFrame(self)
+        self.fifth_frame.grid(row=4, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
         self.model_label.grid(row=0, column=0, padx=10, pady=10)
@@ -80,13 +89,31 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.import_predict_button = customtkinter.CTkButton(self.second_frame, text="Import and predict", command=lambda:import_and_predict_callback(self))
         self.import_predict_button.grid(row=0, column=5, padx=10, pady=10)
 
-        self.fourth_frame.grid_columnconfigure(0, weight=1)
-        self.fourth_frame.grid_columnconfigure(1, weight=1)
+        self.score_label = customtkinter.CTkLabel(self.fourth_frame, text="Score:")
+        self.score_label.grid(row=0, column=0, padx=10, pady=10)
 
-        self.previous_button = customtkinter.CTkButton(self.fourth_frame, text="<", command=lambda:stage_callback(self, self.index - 1))
+        self.score = customtkinter.CTkLabel(self.fourth_frame, text="0.0")
+        self.score.grid(row=0, column=1, padx=10, pady=10)
+
+        self.true_objects_label = customtkinter.CTkLabel(self.fourth_frame, text="True objects:")
+        self.true_objects_label.grid(row=0, column=2, padx=10, pady=10)
+
+        self.true_objects_number = customtkinter.CTkLabel(self.fourth_frame, text="0")
+        self.true_objects_number.grid(row=0, column=3, padx=10, pady=10)
+
+        self.pred_objects_label = customtkinter.CTkLabel(self.fourth_frame, text="Predicted objects:")
+        self.pred_objects_label.grid(row=0, column=4, padx=10, pady=10)
+
+        self.pred_objects_number = customtkinter.CTkLabel(self.fourth_frame, text="0")
+        self.pred_objects_number.grid(row=0, column=5, padx=10, pady=10)
+
+        self.fifth_frame.grid_columnconfigure(0, weight=1)
+        self.fifth_frame.grid_columnconfigure(1, weight=1)
+
+        self.previous_button = customtkinter.CTkButton(self.fifth_frame, text="<", command=lambda:stage_callback(self, self.index - 1))
         self.previous_button.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
-        self.next_button = customtkinter.CTkButton(self.fourth_frame, text=">", command=lambda:stage_callback(self, self.index + 1))
+        self.next_button = customtkinter.CTkButton(self.fifth_frame, text=">", command=lambda:stage_callback(self, self.index + 1))
         self.next_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
     def popup_message(message):
@@ -151,13 +178,27 @@ def predict_callback(self):
     if self.model is None or self.image_combobox.get() == 'Select an image' or self.stage_combobox.get() == 'Select stage':
         print("Model, image or stage not selected")
         return None
-    
+
+    gt_mask = load_ground_truth(self.stage_combobox.get(), self.index)
+    fig1 = plot_ground_truth(gt_mask)
+
     image = np.array([preprocess(load_image(self.stage_combobox.get(), self.index), IMAGE_SHAPE)])
     prediction = tta(self.model, image)
-    fig = plot_prediction(image[0], prediction[0])
-    canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
+    fig2 = plot_prediction(image[0], prediction[0])
+
+    a, b, c = individual_score(gt_mask, np.squeeze(prediction[0]))
+    self.score.configure(text=str(round(c, 2)))
+    self.true_objects_number.configure(text=str(a))
+    self.pred_objects_number.configure(text=str(b))
+
+    canvas = FigureCanvasTkAgg(fig1, master=self.third_frame)
     canvas.draw()
     canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
+
+    canvas = FigureCanvasTkAgg(fig2, master=self.third_frame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=0, column=2, sticky="nsew")
+
     self.update()
     self.update_idletasks()
 

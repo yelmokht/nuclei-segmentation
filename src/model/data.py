@@ -14,6 +14,7 @@ import numpy as np
 from skimage.measure import regionprops, label
 from skimage.transform import resize
 from model.config import *
+from model.pre_processing import preprocess
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -118,7 +119,7 @@ def read_image(image_path):
 
 def binary_mask(id):
     masks_paths = glob(id + '/masks/*.png')
-    masks = np.array([read_image(mask_path) for mask_path in masks_paths])
+    masks = np.array([np.squeeze(preprocess(read_image(mask_path), MASK_SHAPE)) for mask_path in masks_paths])
     num_masks, height, width = masks.shape
     binary_mask = np.zeros((height, width), np.uint8)
     for index in range(0, num_masks):
@@ -184,6 +185,23 @@ def load_image(stage, index):
         raise ValueError(f"Invalid stage '{stage}'")
 
     return read_image(image_path)
+
+def load_ground_truth(stage, index):
+    if stage == 'Train':
+        train_image_paths = sorted(glob(TRAIN_PATH + '*/images/*.png'))
+        train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
+        return binary_mask(train_ids[index])
+    elif stage == 'Stage 1':
+        test_1_image_paths = sorted(glob(STAGE_1_PATH + '*/images/*.png'))
+        test_1_ids = [path.rsplit('/', 2)[0] for path in test_1_image_paths]
+        return labeled_mask(test_1_ids[index])
+
+    elif stage == 'Stage 2':
+        test_2_image_paths = sorted(glob(STAGE_2_PATH + '*/images/*.png'))
+        test_2_ids = [path.rsplit('/', 2)[0] for path in test_2_image_paths]
+        return labeled_mask(test_2_ids[index])
+    else:
+        raise ValueError(f"Invalid stage '{stage}'")
 
 def labeled_mask(id):
     masks_paths = glob(id + '/masks/*.png')

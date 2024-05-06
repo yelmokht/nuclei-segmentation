@@ -30,10 +30,28 @@ from skimage.segmentation import mark_boundaries
 
 def plot_image(image):
     plt.close('all')
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(4, 4))
     plt.imshow(image)
+    plt.tight_layout()
     fig = plt.gcf()
     return fig
+
+def plot_ground_truth(gt_mask):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.imshow(gt_mask)
+    plt.tight_layout()
+    fig = plt.gcf()
+    return fig
+
+def plot_prediction(image, pp_mask):
+    plt.close('all')
+    plt.figure(figsize=(4, 4))
+    plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
+    plt.tight_layout()
+    fig = plt.gcf()
+    return fig
+
 
 # def visualize_augmented_data(train_generator, val_generator, steps_per_epoch, validation_steps):
 #     batch_size = BATCH_SIZE
@@ -104,15 +122,6 @@ def print_plot_history(history):
     axes[1, 1].legend()
     
     return fig
-
-
-def plot_prediction(image, pp_mask):
-    plt.close('all')
-    plt.figure(figsize=(5, 5))
-    plt.imshow(mark_boundaries(image, np.squeeze(pp_mask)))
-    fig = plt.gcf()
-    return fig
-
 
 # def show_results(images, gt_masks, labels, pred_masks, pp_masks, verbose=True):
 #     colors = [(0, 0, 1), (1, 1, 1), (1, 0, 0)]  # (blue, white, red)
