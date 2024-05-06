@@ -61,7 +61,7 @@ models
 
 Google colab notebook is available in notebook folder. Model and history should normally be saved inside your Google Drive.
 
-## Screenshots of applications
+## Screenshots of application
 
 ![Training of a model with DSB dataset](screenshots/training.png)
 ![Prediction of nuclei with trained model with some metrics](screenshots/inference.png)
