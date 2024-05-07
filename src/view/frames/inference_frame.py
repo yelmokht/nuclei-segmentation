@@ -12,6 +12,7 @@ from model.model import load_unet_model
 import keras.backend as K
 from model.data import load_ground_truth, load_image_list_from_stage, load_image, read_image
 from model.inference import tta
+from model.post_processing import post_proccess_masks
 from model.pre_processing import preprocess
 from model.visualization import plot_ground_truth, plot_image, plot_prediction
 import matplotlib
@@ -187,6 +188,7 @@ class InferenceFrame(customtkinter.CTkFrame):
 
         image = np.array([preprocess(load_image(self.stage_combobox.get(), self.index), IMAGE_SHAPE)])
         prediction = tta(self.model, image)
+        prediction = post_proccess_masks(prediction)
         fig2 = plot_prediction(image[0], prediction[0])
 
         a, b, c = individual_score(gt_mask, np.squeeze(prediction[0]))
@@ -226,6 +228,7 @@ class InferenceFrame(customtkinter.CTkFrame):
         fig1 = plot_image(read_image(file_path))
 
         prediction = tta(self.model, image)
+        prediction = post_proccess_masks(prediction)
         fig2 = plot_prediction(image[0], prediction[0])
 
         canvas1 = FigureCanvasTkAgg(fig1, master=self.third_frame)
