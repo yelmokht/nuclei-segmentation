@@ -43,7 +43,7 @@ data
 
 ## Models
 
-This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. A pretrained model for this challenge is available [here](https://drive.google.com/drive/folders/1u1wopGBqXz7Qn5MnICORHx81nz30mZhL?usp=sharing). If you use the application, the model will automatically be downloaded in the `models` folder. You can also train a model inside the application using `Train a new model` feature but a GPU is recommended to function properly. Another option is to use Google Colab to train a model: you can use `nuclei.ipynb` available in the `notebook` folder. After training, the model and its history should normally be saved in your Google Drive. You can then insert them into the `models` folder following this structure:
+This application utilizes deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. A pretrained model for this challenge is accessible [here](https://drive.google.com/drive/folders/1u1wopGBqXz7Qn5MnICORHx81nz30mZhL?usp=sharing). If you use the application, the model will automatically be downloaded in the `models` folder. You can also train a model inside the application using `Train a new model` feature but a GPU is recommended to function properly. Another option is to use Google Colab to train a model: you can use `nuclei.ipynb` available in the `notebook` folder. After training, the model and its history should normally be saved in your Google Drive. You can then insert them into the `models` folder following this structure:
 
 ```markdown
 models
