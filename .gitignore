@@ -165,3 +165,6 @@ data/
 # Models
 models/
 
+# Logs
+temp.txt
+
