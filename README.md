@@ -6,7 +6,7 @@ Link to challenge: https://www.kaggle.com/c/data-science-bowl-2018
 
 Link to download dataset: https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZmtrDccOjKKR/view?usp=sharing
 
-Link to download model: https://drive.google.com/file/d/1UbvdHFv5pvSWy_V-yNSDmrNQmF2bbLSB/view?usp=sharing
+Link to download model: [https://drive.google.com/file/d/1UbvdHFv5pvSWy_V-yNSDmrNQmF2bbLSB/view?usp=sharing](https://drive.google.com/drive/folders/1u1wopGBqXz7Qn5MnICORHx81nz30mZhL?usp=sharing)
 
 ## Data set
 
