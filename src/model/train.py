@@ -20,10 +20,10 @@ def train(model_name, batch_size, epochs):
     dir_path = MODELS_PATH + f'{model_name}'
     os.makedirs(dir_path)
     model_path = MODELS_PATH + f'{model_name}/' + MODEL_FORMAT
-    print(f'Saving model to {model_path}')
+    print(f'Saving model to {model_path} ...')
     save_model(model, model_path)
     print(f'Model {model_name} saved successfully !')
     history_path = MODELS_PATH + f'{model_name}/' + HISTORY_FORMAT
-    print(f'Saving history to {history_path}')
+    print(f'Saving history to {history_path} ...')
     save_history(history, history_path)
     print('History saved successfully !')
