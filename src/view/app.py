@@ -1,11 +1,12 @@
-from contextlib import closing
 import customtkinter
-from CTkMessagebox import CTkMessagebox
-from view.frames.inference import InferenceFrame
-from view.frames.performance import PerformanceFrame
-from view.frames.train import TrainFrame
+from tkinter import messagebox
+from view.frames.inference_frame import InferenceFrame
+from view.frames.performance_frame import PerformanceFrame
+from view.frames.train_frame import TrainFrame
 import matplotlib.pyplot as plt
 import os
+import sys
+import keras.backend as K
 
 customtkinter.set_appearance_mode("System") 
 customtkinter.set_default_color_theme("blue")
@@ -59,40 +60,34 @@ class App(customtkinter.CTk):
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.internal_frame, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
         self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(20, 20))
 
-        # self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        # self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-
-        # self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"], command=self.change_scaling_event)
-        # self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
-
     def is_thread_running(self):
         if self.current_frame:
             if isinstance(self.current_frame, InferenceFrame) and self.current_frame.loading_thread:
                 if self.current_frame.loading_thread.is_alive():        
-                        msg = CTkMessagebox(master=self, title="Exit?", message="A model is being loaded. Are you sure you want to exit?",
-                        icon="question", option_1="Cancel", option_2="No", option_3="Yes", sound=True)
-                        response = msg.get()
-                        if response=="No" or response=="Cancel":
+                        response  = messagebox.askquestion("Exit ?", "A model is being loaded. Are you sure you want to exit ?")
+                        if response == "no":
                             return True
                         else:
-                            print("Loading model stopped.")
+                            self.current_frame.loading_thread_flag = True
+                            print('Model loading stopped')
                             return False
                         
             if isinstance(self.current_frame, TrainFrame) and self.current_frame.training_thread:
                 if self.current_frame.training_thread.is_alive():        
-                        msg = CTkMessagebox(master=self, title="Exit?", message="A model is being trained. Are you sure you want to exit?",
-                        icon="question", option_1="Cancel", option_2="No", option_3="Yes", sound=True)
-                        response = msg.get()
-                        if response=="No" or response=="Cancel":
+                        response = messagebox.askquestion("Exit ?", "A model is being trained. Are you sure you want to exit ? This will close the application !") 
+                        if response == "no":
                             return True
                         else:
-                            self.training_thread = None
-                            print("Training model stopped.")
+                            sys.stdout = sys.__stdout__
+                            sys.stderr = sys.__stderr__
+                            print('Model training stopped')
+                            self.close()
                             return False
 
     def show_frame(self, frame_name):
         if self.is_thread_running():
             return
+        K.clear_session()
         if frame_name == "Train":
             self.current_frame = TrainFrame(self.content_frame)
         elif frame_name == "Predict":
@@ -105,15 +100,14 @@ class App(customtkinter.CTk):
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
-    def change_scaling_event(self, new_scaling: str):
-        new_scaling_float = int(new_scaling.replace("%", "")) / 100
-        customtkinter.set_widget_scaling(new_scaling_float)
-    
     def on_closing(self):
         if self.is_thread_running():
             return
+        self.close()
+        
+    def close(self):
         print("Closing application.")
-        # os.remove("temp.txt") # check if app accidentally closed
+        K.clear_session()
         plt.close()
         self.quit()
         self.destroy()

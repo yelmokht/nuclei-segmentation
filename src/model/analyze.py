@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from collections import Counter
 
 def analyze_data(train_images, test_1_images, test_2_images):

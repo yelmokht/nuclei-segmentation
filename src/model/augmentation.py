@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
+from keras.preprocessing.image import ImageDataGenerator
 from model.config import SEED
 
 def train_val_split(train_images, train_masks, ratio):

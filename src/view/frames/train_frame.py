@@ -1,11 +1,11 @@
-import multiprocessing
 import customtkinter
+import signal
+from tkinter import messagebox
 import os
 import sys
 import threading
 import time
-from model.model import modified_unet_model, train, train_model, save_model, save_history
-import io
+from model.train import train
 
 class TrainFrame(customtkinter.CTkFrame):
     def __init__(self, parent):
@@ -33,14 +33,14 @@ class TrainFrame(customtkinter.CTkFrame):
         self.batch_size_label = customtkinter.CTkLabel(self.first_frame, text="Batch size:")
         self.batch_size_label.grid(row=0, column=2, padx=10, pady=10)
         self.batch_size_combobox = customtkinter.CTkComboBox(self.first_frame, values=["8", "16", "32", "64"])
-        self.batch_size_combobox.set("32")
+        self.batch_size_combobox.set("16")
         self.batch_size_combobox.grid(row=0, column=3, padx=10, pady=10)
 
         self.epochs_label = customtkinter.CTkLabel(self.first_frame, text="Epochs:", text_color_disabled="black")
         self.epochs_label.grid(row=0, column=4, padx=10, pady=10)
         self.epochs_entry = customtkinter.CTkEntry(self.first_frame)
         self.epochs_entry.grid(row=0, column=5, padx=10, pady=10)
-        self.epochs_entry.insert(0, "20")
+        self.epochs_entry.insert(0, "5")
 
         self.train_button = customtkinter.CTkButton(self.first_frame, text="Train", command=lambda:self.train_callback())
         self.train_button.grid(row=0, column=6, columnspan=2, padx=10, pady=10)
@@ -50,31 +50,29 @@ class TrainFrame(customtkinter.CTkFrame):
 
     def train_callback(self):
         if self.model_entry.get() == "":
-            print("Please enter a model name.")
+            messagebox.showerror("Error", "Please enter a model name.")
             return
         
         if self.model_entry.get() in os.listdir("./models"):
-            print("Model name already exists.")
-            print("Please enter a different model name.")
+            messagebox.showerror("Error", "Model name already exists. Please enter a different model name.")
             return
         
         if self.epochs_entry.get() == "":
-            print("Please enter the number of epochs.")
+            messagebox.showerror("Error", "Please enter the number of epochs.")
             return
 
         self.training_thread = threading.Thread(target=training_thread, args=(self,))
-        self.training_thread.setDaemon(True)
-        self.training_thread.start()
+        self.training_thread.daemon = True
 
         self.train_textbox_thread = threading.Thread(target=train_textbox_thread, args=(self,))
-        self.train_textbox_thread.setDaemon(True)
+        self.train_textbox_thread.daemon = True
+
+        self.training_thread.start()
         self.train_textbox_thread.start()
 
+
 def training_thread(self):
-    try:
-        train(self.model_entry.get(), int(self.batch_size_combobox.get()), int(self.epochs_entry.get()))
-    except Exception as e:
-        print("Error training model:", e)
+    train(self.model_entry.get(), int(self.batch_size_combobox.get()), int(self.epochs_entry.get()))
 
 def train_textbox_thread(self):
     open("temp.txt", "w").close()
@@ -84,6 +82,7 @@ def train_textbox_thread(self):
     with open("temp.txt", "a") as stdout_file, open("temp.txt", "a") as stderr_file:
         sys.stdout = stdout_file
         sys.stderr = stderr_file
+        last_content = ""
         try:
             while self.training_thread.is_alive():
                 current_modification_time = os.path.getmtime("temp.txt")
@@ -93,18 +92,19 @@ def train_textbox_thread(self):
                     with open("temp.txt") as f:
                         f.seek(last_file_size)
                         new_content = f.read()
-                        self.train_textbox.insert("end", new_content.replace('\b', ''))                        
-                        if self.train_textbox.yview()[1] > 0.9:
+                        last_content = new_content
+                        if ('\b' or '\r' in new_content) or ('\b' or '\r' in last_content):
+                            self.train_textbox.delete("end-1l", "end")
+                            self.train_textbox.insert("end", new_content.replace('\b', '').replace('\r', ''))                        
+                        if self.train_textbox.yview()[1] > 0.85:
                             self.train_textbox.see("end")
                         self.train_textbox.update()
 
                     last_modification_time = current_modification_time
                     last_file_size = current_file_size
                 
-                time.sleep(0.05)
+                time.sleep(0.01)
         finally:
             sys.stdout = sys.__stdout__
             sys.stderr = sys.__stderr__
-            print("Training complete")
-            # Delete the temporary file
-            os.remove("temp.txt")
+            messagebox.showinfo("Training", "Model training completed.")

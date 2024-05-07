@@ -20,7 +20,6 @@ keras = "2.15.0"
 tensorflow = "2.15.0"
 tensorflow-addons = "0.23.0"
 segmentation-models = "1.0.1"
-ctkmessagebox = "^2.5"
 scikit-learn = "^1.4.2"
 gdown = "^5.1.0"
 

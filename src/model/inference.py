@@ -24,11 +24,11 @@ def tta(model, images):
         # vertical_flip_prediction = model.predict(np.expand_dims(vertical_flip, axis=0), verbose=0)
         # tta_predictions.append(np.flipud(np.squeeze(vertical_flip_prediction)))
 
-        # Mean aggregation
+        # Mean of all predictions
         mean_prediction = np.expand_dims(np.mean(tta_predictions, axis=0), axis=-1)
 
         # Thresholding (example using Otsu's method)
-        mean_mask = (mean_prediction > threshold_otsu(mean_prediction)).astype(np.uint8)
+        mean_mask = (mean_prediction > 0.5).astype(np.uint8)
 
         tta_masks.append(mean_mask)
 

@@ -1,9 +1,9 @@
-from model.data import load_data
+from model.data import load_data, load_models
 from view.app import App
-from model.model import train
 
 def main():
     load_data()
+    load_models()
     app = App()
     app.mainloop()
 

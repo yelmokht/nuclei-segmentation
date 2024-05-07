@@ -238,21 +238,29 @@ def load_solution(test_1_path, test_2_path):
 
     return test_1_labels, test_2_labels, test_1_markers, test_2_markers
 
-def get_model_path(model_name):
-    return f'model_{model_name}.keras'
 
-# Load data
 def load_data():
     if not os.path.exists(SOURCE_PATH):
         print('DSB 2018 dataset not found.')
+        os.makedirs(DATA_PATH)
         gdown.download(url=SOURCE_URL, output=SOURCE_PATH, fuzzy=True)
+        print('DSB 2018 dataset successfully downloaded !')
     if not os.path.exists(DATA_PATH):
-        unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH)  #Should be run only once
-        save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1')              #Should be run only once
-        save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2')              #Should be run only once
-        remove_ignored_images_masks(STAGE_2_SOLUTION_PATH, TEST_2_PATH)         #Should be run only once
+        unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH)
+        save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1')            
+        save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2')            
+        remove_ignored_images_masks(STAGE_2_SOLUTION_PATH, TEST_2_PATH)       
         print("Data successfully loaded !")
-    else:
-        print("Data already exists.")
+
+def load_models():
+    if not os.path.exists(MODELS_PATH):
+        print("Models folder not found.")
+        os.makedirs(MODELS_PATH)
+        gdown.download_folder(url=MODEL_URL, output=MODELS_PATH)
+        print("Model successfully downloaded !")
 
     print("The application is now ready to launch.")
+
+    
+
+
