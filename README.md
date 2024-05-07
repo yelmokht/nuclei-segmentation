@@ -1,40 +1,16 @@
 # nuclei-segmentation
 
-Development of machine learning model for instance segmentation of nuclei cells for Kaggle Data Science Bowl 2018 challenge. 
-
-Link to challenge: https://www.kaggle.com/c/data-science-bowl-2018
-
-Link to download dataset: https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZmtrDccOjKKR/view?usp=sharing
-
-Link to download model: [https://drive.google.com/file/d/1UbvdHFv5pvSWy_V-yNSDmrNQmF2bbLSB/view?usp=sharing](https://drive.google.com/drive/folders/1u1wopGBqXz7Qn5MnICORHx81nz30mZhL?usp=sharing)
-
-## Data set
-
-This application use the dataset from Kaggle
-
-## Data structure
-
-```text
-nuclei-segmentation
-    data
-        data-science-bowl-2018.zip (should place there)
-    doc
-        report.pdf
-    models
-        model_name
-            model.h5
-            history.csv
-    notebook
-        nuclei.ipynb (Google Colab)
-    src
-    submissions
-    poetry.lock
-    pyproject.toml
-```
+Development of machine learning model for instance segmentation of nuclei cells for [Kaggle Data Science Bowl 2018 challenge](https://www.kaggle.com/c/data-science-bowl-2018). 
 
 ## Installation
 
-Make sure first that poetry is installed:
+First, clone the GitHub repository:
+
+```bash
+git clone https://github.com/yelmokht/nuclei-segmentation.git
+```
+
+Make sure that poetry is installed:
 
 ```bash
 pip install poetry
@@ -48,15 +24,26 @@ poetry install
 
 ## Usage
 
-Once this is done, you can run the application:
+Once installation is complete, you can run the application:
 
 ```bash
 poetry run python src/main.py
 ```
 
+## Dataset
+
+This application uses the dataset from Kaggle Data Science Bowl 2018 available [here](https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZmtrDccOjKKR/view?usp=sharing). If you use the application, the dataset will automatically be downloaded in the `data` folder.
+
+```markdown
+data
+    ├── dsb-2018
+    ├── unzipped
+    └── data-science-bowl-2018.zip
+```
+
 ## Models
 
-This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. You can either train a model inside the application using `Train a new model` part but a GPU is recommended to function properly. Another option is to use Google Colab to train a model and then insert in the `models` folder following this structure:
+This application uses deep learning and convolutionnal neural networks (CNN) with tensorflow/keras library. A pretrained model for this challenge is available [here](https://drive.google.com/drive/folders/1u1wopGBqXz7Qn5MnICORHx81nz30mZhL?usp=sharing). If you use the application, the model will automatically be downloaded in the `models` folder. You can also train a model inside the application using `Train a new model` feature but a GPU is recommended to function properly. Another option is to use Google Colab to train a model: you can use `nuclei.ipynb` available in the `notebook` folder. After training, the model and its history should normally be saved in your Google Drive. You can then insert them into the `models` folder following this structure:
 
 ```markdown
 models
@@ -64,8 +51,6 @@ models
     │   ├── model.h5
     │   └── history.csv
 ```
-
-Google colab notebook is `nuclei.ipynb` available in `notebook` folder. Model and history should normally be saved inside your Google Drive.
 
 ## Screenshots of application
 
