@@ -30,7 +30,7 @@ Once installation is complete, you can run the application:
 poetry run python src/main.py
 ```
 
-## Dataset
+## Data
 
 This application uses the dataset from Kaggle Data Science Bowl 2018 available [here](https://drive.google.com/file/d/16gp8kPxMFrSDiLjgw2eaZmtrDccOjKKR/view?usp=sharing). If you use the application, the dataset will automatically be downloaded in the `data` folder.
 
