@@ -82,7 +82,6 @@ def train_textbox_thread(self):
     with open("temp.txt", "a") as stdout_file, open("temp.txt", "a") as stderr_file:
         sys.stdout = stdout_file
         sys.stderr = stderr_file
-        last_content = ""
         try:
             while self.training_thread.is_alive():
                 current_modification_time = os.path.getmtime("temp.txt")
@@ -92,10 +91,9 @@ def train_textbox_thread(self):
                     with open("temp.txt") as f:
                         f.seek(last_file_size)
                         new_content = f.read()
-                        last_content = new_content
-                        if ('\b' or '\r' in new_content) or ('\b' or '\r' in last_content):
+                        if ('\b' or '\r' in new_content):
                             self.train_textbox.delete("end-1l", "end")
-                            self.train_textbox.insert("end", new_content.replace('\b', '').replace('\r', ''))                        
+                            self.train_textbox.insert("end", new_content.replace('\b', '').replace('\r', ''))
                         if self.train_textbox.yview()[1] > 0.85:
                             self.train_textbox.see("end")
                         self.train_textbox.update()
