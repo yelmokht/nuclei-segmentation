@@ -4,7 +4,7 @@ from skimage.filters import threshold_otsu
 
 def tta(model, images):
     tta_masks = []
-    for image in tqdm(images, desc='TTA for test images (stage 2)'):
+    for image in tqdm(images, desc='TTA for images'):
         tta_predictions = []
         original_prediction = model.predict(np.expand_dims(image, axis=0), verbose=0)
         tta_predictions.append(np.squeeze(original_prediction))

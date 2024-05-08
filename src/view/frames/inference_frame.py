@@ -38,10 +38,15 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.second_frame.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
         self.third_frame = customtkinter.CTkFrame(self)
-        self.third_frame.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
         self.third_frame.grid_rowconfigure(0, weight=1)
+        self.third_frame.grid_columnconfigure(0, weight=1)
         self.third_frame.grid_columnconfigure(1, weight=1)
         self.third_frame.grid_columnconfigure(2, weight=1)
+
+        self.third_frame_pred = customtkinter.CTkFrame(self)
+        self.third_frame_pred.grid_rowconfigure(0, weight=1)
+        self.third_frame_pred.grid_columnconfigure(0, weight=1)
+        self.third_frame_pred.grid_columnconfigure(1, weight=1)
 
         self.fourth_frame = customtkinter.CTkFrame(self)
         self.fourth_frame.grid(row=3, column=0, padx=10, pady=(10, 0), sticky="nsew")
@@ -89,6 +94,15 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.import_predict_button = customtkinter.CTkButton(self.second_frame, text="Import and predict", command=self.import_and_predict_callback)
         self.import_predict_button.grid(row=0, column=5, padx=10, pady=10)
 
+        self.canvas_image = FigureCanvasTkAgg(matplotlib.figure.Figure(), master=self.third_frame)
+        self.canvas_image.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+        self.canvas_gt = FigureCanvasTkAgg(matplotlib.figure.Figure(), master=self.third_frame)
+        self.canvas_gt.get_tk_widget().grid(row=0, column=1, sticky="nsew")
+
+        self.canvas_pred = FigureCanvasTkAgg(matplotlib.figure.Figure(), master=self.third_frame)
+        self.canvas_pred.get_tk_widget().grid(row=0, column=2, sticky="nsew")
+
         self.score_label = customtkinter.CTkLabel(self.fourth_frame, text="Score:")
         self.score_label.grid(row=0, column=0, padx=10, pady=10)
 
@@ -112,17 +126,6 @@ class InferenceFrame(customtkinter.CTkFrame):
 
         self.next_button = customtkinter.CTkButton(self.fifth_frame, text=">", command=lambda: self.stage_callback(self, index=self.index + 1))
         self.next_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
-
-    def load_model_thread(self):
-        try:
-            self.model = load_unet_model(self.model_name)
-            if self.loading_thread_flag:
-                self.model = None
-                self.loading_thread_flag = False
-                K.clear_session()
-                print('Model loading stopped')
-        except Exception as e:
-            print("Error loading model:", e)
 
     def load_callback(self, x):
         if self.model_combobox.get() == 'Select a model':
@@ -160,7 +163,7 @@ class InferenceFrame(customtkinter.CTkFrame):
         images_list = load_image_list_from_stage(self.stage_combobox.get())
         self.image_combobox.configure(values=images_list)
         self.image_combobox.set(images_list[self.index])
-        self.image_combobox_callback(self)
+        self.image_combobox_callback(x)
 
     def image_combobox_callback(self, x):
         if self.image_combobox.get() == 'Select an image':
@@ -170,9 +173,12 @@ class InferenceFrame(customtkinter.CTkFrame):
         image = load_image(self.stage_combobox.get(), self.index)
         fig = plot_image(image)
 
-        canvas = FigureCanvasTkAgg(fig, master=self.third_frame)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+        if self.third_frame_pred.winfo_ismapped():
+            self.third_frame_pred.grid_remove()
+        self.third_frame.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
+
+        self.canvas_image.figure = fig
+        self.canvas_image.draw()
 
         if self.model is not None:
             self.predict_callback()
@@ -183,29 +189,23 @@ class InferenceFrame(customtkinter.CTkFrame):
             return None
 
         gt_mask = load_ground_truth(self.stage_combobox.get(), self.index)
-        fig1 = plot_ground_truth(gt_mask)
+        fig2 = plot_ground_truth(gt_mask)
 
         image = np.array([preprocess(load_image(self.stage_combobox.get(), self.index), IMAGE_SHAPE)])
         prediction = tta(self.model, image)
         prediction = post_proccess_masks(prediction)
-        fig2 = plot_prediction(image[0], prediction[0])
+        fig3 = plot_prediction(image[0], prediction[0])
 
         a, b, c = individual_score(gt_mask, np.squeeze(prediction[0]))
         self.score.configure(text=str(round(c, 2)))
         self.true_objects_number.configure(text=str(a))
         self.pred_objects_number.configure(text=str(b))
 
-        self.third_frame.columnconfigure(0, weight=1)
-        self.third_frame.columnconfigure(1, weight=1)
-        self.third_frame.columnconfigure(2, weight=1)
+        self.canvas_gt.figure = fig2
+        self.canvas_gt.draw()
 
-        canvas = FigureCanvasTkAgg(fig1, master=self.third_frame)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
-
-        canvas = FigureCanvasTkAgg(fig2, master=self.third_frame)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=2, sticky="nsew")
+        self.canvas_pred.figure = fig3
+        self.canvas_pred.draw()
 
     def import_and_predict_callback(self):
         if self.model is None:
@@ -217,26 +217,21 @@ class InferenceFrame(customtkinter.CTkFrame):
         if not file_path:
             return None
 
-        self.third_frame = customtkinter.CTkFrame(self)
-        self.third_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="nsew")
-        self.third_frame.grid_rowconfigure(0, weight=1)
-        self.third_frame.grid_columnconfigure(0, weight=1)
-        self.third_frame.grid_columnconfigure(1, weight=1)
 
         image = np.array([preprocess(read_image(file_path), IMAGE_SHAPE)])
         fig1 = plot_image(read_image(file_path))
 
         prediction = tta(self.model, image)
         prediction = post_proccess_masks(prediction)
-        fig2 = plot_prediction(image[0], prediction[0])
+        fig3 = plot_prediction(image[0], prediction[0])
 
-        canvas1 = FigureCanvasTkAgg(fig1, master=self.third_frame)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+        self.third_frame_pred.grid(row=2, column=0, padx=10, pady=(10, 0), sticky="nsew")
 
-        canvas2 = FigureCanvasTkAgg(fig2, master=self.third_frame)
-        canvas2.draw()
-        canvas2.get_tk_widget().grid(row=0, column=1, sticky="nsew")
+        self.canvas_image_pred = FigureCanvasTkAgg(fig1, master=self.third_frame_pred)
+        self.canvas_image_pred.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+        self.canvas_pred_pred = FigureCanvasTkAgg(fig3, master=self.third_frame_pred)
+        self.canvas_pred_pred.get_tk_widget().grid(row=0, column=1, sticky="nsew")
 
 
 def load_model_thread(self):
