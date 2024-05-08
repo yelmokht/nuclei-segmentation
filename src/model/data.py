@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 from zipfile import ZipFile
 from glob import glob
@@ -256,7 +257,10 @@ def load_models():
     if not os.path.exists(MODELS_PATH):
         print("Models folder not found.")
         os.makedirs(MODELS_PATH)
-        gdown.download_folder(url=MODEL_URL, output=MODELS_PATH)
+        if platform.system() == "Windows":
+            gdown.download_folder(url=MODEL_URL, output=MODEL_PATH)
+        else:
+            gdown.download_folder(url=MODEL_URL, output=MODELS_PATH)
         print("Model successfully downloaded !")
 
     print("The application is now ready to launch.")
