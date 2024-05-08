@@ -21,7 +21,10 @@ def post_proccess_masks(test_pred_masks):
             radii.append(radius)
         average_radius = int(round(np.mean(radii)))
         distance = distance_transform_edt(mask)
-        markers = label(peak_local_max(distance, min_distance=average_radius, footprint=disk(average_radius), threshold_rel=0.2, indices=False, exclude_border=False)) #min distance to determine
+        peaks = peak_local_max(distance, min_distance=average_radius, footprint=disk(average_radius), threshold_rel=0.2, exclude_border=False)
+        peak_mask = np.zeros_like(mask, dtype=bool)
+        peak_mask[tuple(peaks.T)] = True
+        markers = label(peak_mask)
         wsh = watershed(-distance, markers, mask=mask)
         # markers[mask == 0] = -1
         # rw = random_walker(mask, markers)

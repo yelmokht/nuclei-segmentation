@@ -149,7 +149,7 @@ def markers(id):
 
 def load_train_data(train_path):
     train_image_paths = sorted(glob(train_path + '*/images/*.png'))
-    train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
+    train_ids = [path.rsplit(os.sep, 2)[0] for path in train_image_paths]
     train_images = [read_image(image_path) for image_path in tqdm(train_image_paths, desc='Loading train images')]
     train_masks = [binary_mask(id) for id in tqdm(train_ids, desc='Loading train masks')]
     return train_images, train_masks
@@ -159,9 +159,9 @@ def load_all_data(train_path, test_1_path, test_2_path):
     test_1_image_paths = sorted(glob(test_1_path + '*/images/*.png'))
     test_2_image_paths = sorted(glob(test_2_path + '*/images/*.png'))
 
-    train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
-    test_1_ids = [path.rsplit('/', 2)[0] for path in test_1_image_paths]
-    test_2_ids = [path.rsplit('/', 2)[0] for path in test_2_image_paths]
+    train_ids = [path.rsplit(os.sep, 2)[0] for path in train_image_paths]
+    test_1_ids = [path.rsplit(os.sep, 2)[0] for path in test_1_image_paths]
+    test_2_ids = [path.rsplit(os.sep, 2)[0] for path in test_2_image_paths]
 
     train_images = [read_image(image_path) for image_path in tqdm(train_image_paths, desc='Train images')]
     test_1_images = [read_image(image_path) for image_path in tqdm(test_1_image_paths, desc='Test images (stage 1)')]
@@ -179,13 +179,13 @@ def load_all_data(train_path, test_1_path, test_2_path):
 def load_image_list_from_stage(stage):
     if stage == 'Train':
         train_image_paths = sorted(glob(TRAIN_PATH + '*/images/*.png'))
-        image_list = [train_image_paths.split('/')[-1] for train_image_paths in train_image_paths]
+        image_list = [train_image_paths.split(os.sep)[-1] for train_image_paths in train_image_paths]
     elif stage == 'Stage 1':
         test_1_image_paths = sorted(glob(TEST_1_PATH + '*/images/*.png'))
-        image_list = [test_1_image_paths.split('/')[-1] for test_1_image_paths in test_1_image_paths]
+        image_list = [test_1_image_paths.split(os.sep)[-1] for test_1_image_paths in test_1_image_paths]
     elif stage == 'Stage 2':
         test_2_image_paths = sorted(glob(TEST_2_PATH + '*/images/*.png'))
-        image_list = [test_2_image_paths.split('/')[-1] for test_2_image_paths in test_2_image_paths]
+        image_list = [test_2_image_paths.split(os.sep)[-1] for test_2_image_paths in test_2_image_paths]
     else:
         raise ValueError(f"Invalid stage '{stage}'")
 
@@ -210,15 +210,15 @@ def load_image(stage, index):
 def load_ground_truth(stage, index):
     if stage == 'Train':
         train_image_paths = sorted(glob(TRAIN_PATH + '*/images/*.png'))
-        train_ids = [path.rsplit('/', 2)[0] for path in train_image_paths]
+        train_ids = [path.rsplit(os.sep, 2)[0] for path in train_image_paths]
         return np.squeeze(preprocess(binary_mask(train_ids[index]), MASK_SHAPE))
     elif stage == 'Stage 1':
         test_1_image_paths = sorted(glob(STAGE_1_PATH + '*/images/*.png'))
-        test_1_ids = [path.rsplit('/', 2)[0] for path in test_1_image_paths]
+        test_1_ids = [path.rsplit(os.sep, 2)[0] for path in test_1_image_paths]
         return labeled_mask(test_1_ids[index])
     elif stage == 'Stage 2':
         test_2_image_paths = sorted(glob(STAGE_2_PATH + '*/images/*.png'))
-        test_2_ids = [path.rsplit('/', 2)[0] for path in test_2_image_paths]
+        test_2_ids = [path.rsplit(os.sep, 2)[0] for path in test_2_image_paths]
         return labeled_mask(test_2_ids[index])
     else:
         raise ValueError(f"Invalid stage '{stage}'")
@@ -227,8 +227,8 @@ def load_solution(test_1_path, test_2_path):
     test_1_image_paths = sorted(glob(test_1_path + '*/images/*.png'))
     test_2_image_paths = sorted(glob(test_2_path + '*/images/*.png'))
 
-    test_1_ids = [path.rsplit('/', 2)[0] for path in test_1_image_paths]
-    test_2_ids = [path.rsplit('/', 2)[0] for path in test_2_image_paths]
+    test_1_ids = [path.rsplit(os.sep, 2)[0] for path in test_1_image_paths]
+    test_2_ids = [path.rsplit(os.sep, 2)[0] for path in test_2_image_paths]
 
     test_1_labels = [labeled_mask(id) for id in tqdm(test_1_ids, desc='Test labels (stage 1)')]
     test_2_labels = [labeled_mask(id) for id in tqdm(test_2_ids, desc='Test labels (stage 2)')]

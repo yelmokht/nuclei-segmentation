@@ -1,3 +1,4 @@
+import os
 import customtkinter
 from glob import glob
 from model.config import HISTORY_FORMAT, MODELS_PATH
@@ -27,7 +28,7 @@ class PerformanceFrame(customtkinter.CTkFrame):
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
         self.model_label.grid(row=0, column=0, padx=10, pady=10)
 
-        models_list = [model.split('/')[-1] for model in sorted(glob(MODELS_PATH + '*'))]
+        models_list = [model.split(os.sep)[-1] for model in sorted(glob(MODELS_PATH + '*'))]
         self.model_combobox = customtkinter.CTkComboBox(self.first_frame, values=models_list, command=lambda x:self.history_callback(self))
         self.model_combobox.set("Select a model")
         self.model_combobox.grid(row=0, column=1, padx=10, pady=10)

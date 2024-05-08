@@ -1,8 +1,7 @@
-import multiprocessing
+import os
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
-import tkinter
 import customtkinter
 from glob import glob
 from model.config import *
@@ -55,7 +54,7 @@ class InferenceFrame(customtkinter.CTkFrame):
         self.model_label = customtkinter.CTkLabel(self.first_frame, text="Model:")
         self.model_label.grid(row=0, column=0, padx=10, pady=10)
 
-        models_list = [model.split('/')[-1] for model in sorted(glob(MODELS_PATH + '*'))]
+        models_list = [model.split(os.sep)[-1] for model in sorted(glob(MODELS_PATH + '*'))]
         self.model_combobox = customtkinter.CTkComboBox(self.first_frame, values=models_list)
         self.model_combobox.set("Select a model")
         self.model_combobox.grid(row=0, column=1, padx=10, pady=10)

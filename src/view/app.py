@@ -58,6 +58,7 @@ class App(customtkinter.CTk):
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
 
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.internal_frame, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
+        self.appearance_mode_optionemenu.set("System")
         self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(20, 20))
 
     def is_thread_running(self):
