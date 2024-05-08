@@ -246,7 +246,7 @@ def load_data():
         os.makedirs(DATA_PATH)
         gdown.download(url=SOURCE_URL, output=SOURCE_PATH, fuzzy=True)
         print('DSB 2018 dataset successfully downloaded !')
-    if not os.path.exists(DATA_PATH):
+    if not os.path.exists(DSB_PATH):
         unzip_and_structure_data(SOURCE_PATH, UNZIPPED_PATH, DESTINATION_PATH)
         save_masks(STAGE_1_SOLUTION_PATH, STAGE_1_PATH, 'Stage 1')            
         save_masks(STAGE_2_SOLUTION_PATH, STAGE_2_PATH, 'Stage 2')            
