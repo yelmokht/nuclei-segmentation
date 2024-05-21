@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "nuclei-segmentation"
 version = "0.1.0"
-description= "An application designed to accurately segment nuclei cells across diverse conditions using pretrained models."
+description= "An application designed to accurately segment nuclei cells across diverse conditions"
 authors = ["yelmokht <younes.el.mokhtari@ulb.be>"]
 license = "MIT"
 readme = "README.md"
