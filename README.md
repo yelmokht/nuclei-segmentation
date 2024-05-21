@@ -22,6 +22,13 @@ Then, install all necessary packages:
 poetry install
 ```
 
+Note: If you are on Windows and use Intel processor with an iGPU, you may encounter this error: ModuleNotFoundError: No module named 'tensorflow'
+To resolve this, do this command on the terminal and tensorflow-intel 2.15.0 will be installed:
+
+```bash
+pip install tensorflow
+```
+
 ## Usage
 
 Once installation is complete, you can run the application:
