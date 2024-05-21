@@ -26,7 +26,7 @@ Note: If you are on Windows and use Intel processor with an iGPU, you may encoun
 To resolve this, do this command on the terminal and tensorflow-intel 2.15.0 will be installed:
 
 ```bash
-pip install tensorflow==2.15.0
+pip install tensorflow-intel==2.15.0
 ```
 
 ## Usage
